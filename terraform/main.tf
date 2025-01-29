@@ -83,11 +83,11 @@ resource "aws_instance" "react_native_notes" {
       "curl -fsSL https://get.docker.com -o install-docker.sh",
       "sudo sh install-docker.sh",
       "sudo docker info",
-      "git clone https://github.com/aayush301/react-native-notes-app.git",
+      "git clone https://github.com/gopikrishnayakkati/react-native-notes-app.git",
       "sudo cd react-native-notes-app",
       "ls -al",
-      "sudo docker build -t react-native-notes .",
-      "sudo docker run -d -p 8081:8081 react-native-notes",
+      "sudo docker build -t react-native-notes:1.0 .",
+      "sudo docker run -d -p 8081:8081 react-native-notes:1.0 ",
       "sudo docker container ls -a"
     ]
 
