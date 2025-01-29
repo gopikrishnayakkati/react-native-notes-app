@@ -1,0 +1,68 @@
+resource "aws_vpc" "main_vpc" {
+  cidr_block = var.vpc_cidr
+
+  tags = {
+    Name = "MainVPC"
+  }
+}
+resource "aws_subnet" "main_subnet" {
+  vpc_id            = aws_vpc.main_vpc.id
+  cidr_block        = var.subnet_cidr
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "MainSubnet"
+  }
+}
+
+resource "aws_internet_gateway" "main_igw" {
+  vpc_id = aws_vpc.main_vpc.id
+}
+
+resource "aws_route_table" "main_rt" {
+  vpc_id = aws_vpc.main_vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.main_igw.id
+  }
+}
+
+resource "aws_route_table_association" "main_rta" {
+  subnet_id      = aws_subnet.main_subnet.id
+  route_table_id = aws_route_table.main_rt.id
+}
+
+# EC2 Instance
+resource "aws_instance" "react_native_notes" {
+  ami           = var.ami_id
+  instance_type = var.instance_type
+  key_name      = var.key_name
+  subnet_id     = aws_subnet.main_subnet.id
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt-get update -y",
+      "sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common",
+      "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -",
+      "sudo add-apt-repository \"deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\"",
+      "sudo apt-get update -y",
+      "sudo apt-get install -y docker-ce",
+      "git clone https://github.com/aayush301/react-native-notes-app.git",
+      "cd react-native-notes-app",
+      "sudo docker build -t react-native-notes .",
+      "sudo docker run -p 8081:8081 react-native-notes"
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file(var.private_key_path)
+      host        = self.public_ip
+    }
+  }
+
+  tags = {
+    Name = "ReactNativeNotesAppInstance"
+  }
+}
