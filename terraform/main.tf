@@ -75,7 +75,7 @@ resource "aws_instance" "react_native_notes" {
   instance_type = var.instance_type
   key_name      = aws_key_pair.generated_key.key_name
   subnet_id     = aws_subnet.main_subnet.id
-  security_groups = [aws_security_group.allow_ssh.name]
+  security_groups = [aws_security_group.allow_ssh.id]
 
   provisioner "remote-exec" {
     inline = [
