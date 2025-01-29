@@ -26,10 +26,16 @@ jobs:
         aws-region: ap-south-1
 
     - name: Initialize Terraform
-      run: terraform init -backend=false -chdir=terraform
+      run: |
+        cd terraform
+        terraform init -reconfigure
 
     - name: Create Terraform Workspace
-      run:   terraform workspace new Node.js || terraform workspace select Node.js  -chdir=terraform
+      run: |
+        cd terraform
+        terraform workspace new Node.js || terraform workspace select Node.js
 
     - name: Apply Terraform Configuration
-      run: terraform apply -var-file="Node.js-environment.tfvars" -auto-approve -chdir=terraform
+      run: |
+        cd terraform
+        terraform apply -var-file="Node.js-environment.tfvars" -auto-approve
