@@ -84,7 +84,8 @@ resource "aws_instance" "react_native_notes" {
       "sudo sh install-docker.sh",
       "sudo docker info",
       "git clone https://github.com/aayush301/react-native-notes-app.git",
-      "cd react-native-notes-app",
+      "sudo cd react-native-notes-app",
+      "ls -al",
       "sudo docker build -t react-native-notes .",
       "sudo docker run -d -p 8081:8081 react-native-notes",
       "sudo docker container ls -a"
