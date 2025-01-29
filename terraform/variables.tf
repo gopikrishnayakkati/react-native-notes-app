@@ -28,5 +28,6 @@ variable "key_name" {
 }
 
 variable "private_key_path" {
-  description = "the private key file"
+  description = "Path to the private key file"
+  default     = "generated-key.pem"
 }

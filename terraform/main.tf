@@ -33,11 +33,26 @@ resource "aws_route_table_association" "main_rta" {
   route_table_id = aws_route_table.main_rt.id
 }
 
+resource "tls_private_key" "generated_key" {
+  algorithm = "RSA"
+  rsa_bits  = 2048
+}
+
+resource "aws_key_pair" "generated_key" {
+  key_name   = "generated-key"
+  public_key = tls_private_key.generated_key.public_key_openssh
+}
+
+# Save private key to a local file
+resource "local_file" "private_key" {
+  content  = tls_private_key.generated_key.private_key_pem
+  filename = "generated-key.pem"
+}
 # EC2 Instance
 resource "aws_instance" "react_native_notes" {
   ami           = var.ami_id
   instance_type = var.instance_type
-  key_name      = var.key_name
+  key_name      = aws_key_pair.generated_key.key_name
   subnet_id     = aws_subnet.main_subnet.id
 
   provisioner "remote-exec" {
@@ -57,7 +72,7 @@ resource "aws_instance" "react_native_notes" {
     connection {
       type        = "ssh"
       user        = "ubuntu"
-      private_key = file(var.private_key_path)
+      private_key = file(local_file.private_key.filename)
       host        = self.public_ip
     }
   }
