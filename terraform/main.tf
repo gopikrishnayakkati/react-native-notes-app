@@ -48,12 +48,34 @@ resource "local_file" "private_key" {
   content  = tls_private_key.generated_key.private_key_pem
   filename = "generated-key.pem"
 }
+resource "aws_security_group" "allow_ssh" {
+  vpc_id = aws_vpc.main_vpc.id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # Change this to your IP for better security
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "AllowSSH"
+  }
+}
 # EC2 Instance
 resource "aws_instance" "react_native_notes" {
   ami           = var.ami_id
   instance_type = var.instance_type
   key_name      = aws_key_pair.generated_key.key_name
   subnet_id     = aws_subnet.main_subnet.id
+  security_groups = [aws_security_group.allow_ssh.name]
 
   provisioner "remote-exec" {
     inline = [
