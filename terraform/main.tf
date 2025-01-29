@@ -55,7 +55,13 @@ resource "aws_security_group" "allow_ssh" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Change this to your IP for better security
+    cidr_blocks = ["0.0.0.0/0"] 
+  }
+   ingress {
+    from_port        = 8081
+    to_port          = 8081
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
   }
 
   egress {
@@ -66,7 +72,7 @@ resource "aws_security_group" "allow_ssh" {
   }
 
   tags = {
-    Name = "AllowSSH"
+    Name = "Allow ssh and 8081"
   }
 }
 # EC2 Instance
